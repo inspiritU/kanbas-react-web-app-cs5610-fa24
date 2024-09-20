@@ -8,7 +8,7 @@ export default function Dashboard() {
                 <div className="wd-dashboard-course">
                     <Link className="wd-dashboard-course-link"
                           to="/Kanbas/Courses/1234/Home">
-                        <img src="/images/reactjs.jpg" width={200} alt="ReactJS logo" />
+                        <img src="https://www.popwebdesign.net/popart_blog/wp-content/uploads/2018/03/reactjs.jpg" width={200} alt="ReactJS logo" />
                         <div>
                             <h5>
                                 CS1234 React JS
@@ -20,8 +20,36 @@ export default function Dashboard() {
                         </div>
                     </Link>
                 </div>
-                <div className="wd-dashboard-course"> ... </div>
-                <div className="wd-dashboard-course"> ... </div>
+                <div className="wd-dashboard-course">
+                    <Link className="wd-dashboard-course-link"
+                          to="/Kanbas/Courses/1234/Home">
+                        <img src="https://www.popwebdesign.net/popart_blog/wp-content/uploads/2018/03/reactjs.jpg" width={200} alt="ReactJS logo" />
+                        <div>
+                            <h5>
+                                CS1234 React JS
+                            </h5>
+                            <p className="wd-dashboard-course-title">
+                                Full Stack software developer
+                            </p>
+                            <button> Go </button>
+                        </div>
+                    </Link>
+                </div>
+                <div className="wd-dashboard-course">
+                    <Link className="wd-dashboard-course-link"
+                          to="/Kanbas/Courses/1234/Home">
+                        <img src="https://www.popwebdesign.net/popart_blog/wp-content/uploads/2018/03/reactjs.jpg" width={200} alt="ReactJS logo" />
+                        <div>
+                            <h5>
+                                CS1234 React JS
+                            </h5>
+                            <p className="wd-dashboard-course-title">
+                                Full Stack software developer
+                            </p>
+                            <button> Go </button>
+                        </div>
+                    </Link>
+                </div>
             </div>
         </div>
     );
