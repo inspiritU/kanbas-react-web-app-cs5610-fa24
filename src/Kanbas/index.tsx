@@ -3,7 +3,6 @@ import Account from "./Account";
 import Dashboard from "./Dashboard";
 import KanbasNavigation from "./Navigation";
 import Courses from "./Courses";
-import LandingPage from "../LandingPage";
 export default function Kanbas() {
     return (
         <div id="wd-kanbas">
@@ -15,7 +14,6 @@ export default function Kanbas() {
                     <td valign="top">
                         <Routes>
                             <Route path="/" element={<Navigate to="/Kanbas/Account" />} />
-                            <Route path="/LandingPage" element={<LandingPage />} />
                             <Route path="/Account/*" element={<Account />} />
                             <Route path="/Dashboard" element={<Dashboard />} />
                             <Route path="/Courses/:cid/*" element={<Courses />} />
