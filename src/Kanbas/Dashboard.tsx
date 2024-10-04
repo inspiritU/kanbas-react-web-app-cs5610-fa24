@@ -3,52 +3,93 @@ export default function Dashboard() {
     return (
         <div id="wd-dashboard">
             <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
-            <h2 id="wd-dashboard-published">Published Courses (12)</h2> <hr />
-            <div id="wd-dashboard-courses">
-                <div className="wd-dashboard-course">
-                    <Link className="wd-dashboard-course-link"
-                          to="/Kanbas/Courses/1234/Home">
-                        <img src="https://www.popwebdesign.net/popart_blog/wp-content/uploads/2018/03/reactjs.jpg" width={200} alt="ReactJS logo" />
-                        <div>
-                            <h5>
-                                CS1234 React JS
+            <h2 id="wd-dashboard-published">Published Courses (4)</h2> <hr />
+            <div id="wd-dashboard-courses" className="row">
+                <div className="row row-cols-1 row-cols-md-5 g-4">
+                    <div className="wd-dashboard-course col" style={{ width: "300px" }}>
+                        <div className="card rounded-3 overflow-hidden">
+                            <Link className="wd-dashboard-course-link text-decoration-none text-dark"
+                                  to="/Kanbas/Courses/1234/Home">
+                        <img src="images/CS5340.IS4300.202430.png" width="100%" height={160} />
+                                <div className="card-body">
+                                    <h5 className="wd-dashboard-course-title card-title">
+
+                                        CS5340/IS4300 - Human Computer Interaction MERGED
                             </h5>
-                            <p className="wd-dashboard-course-title">
-                                Full Stack software developer
+                                    <p className="wd-dashboard-course-title card-text">
+                                        CS5340.IS4300.202430
+
                             </p>
-                            <button> Go </button>
-                        </div>
+
+
+                                </div>
                     </Link>
+                        </div>
                 </div>
-                <div className="wd-dashboard-course">
-                    <Link className="wd-dashboard-course-link"
-                          to="/Kanbas/Courses/1234/Home">
-                        <img src="https://www.popwebdesign.net/popart_blog/wp-content/uploads/2018/03/reactjs.jpg" width={200} alt="ReactJS logo" />
-                        <div>
-                            <h5>
-                                CS1234 React JS
+                <div className="wd-dashboard-course col" style={{ width: "300px" }}>
+                    <div className="card rounded-3 overflow-hidden">
+                        <Link className="wd-dashboard-course-link text-decoration-none text-dark"
+
+                              to="/Kanbas/Courses/1234/Home">
+                        <img src="images/CS6220.21066.202510.png"  width="100%" height={160} />
+                            <div className="card-body">
+                                <h5 className="wd-dashboard-course-title card-title">
+
+                                    CS6220 21066 Data Mining Techniques SEC 03 Fall 2024 [SJO-2-TR]
                             </h5>
-                            <p className="wd-dashboard-course-title">
-                                Full Stack software developer
+                                <p className="wd-dashboard-course-title card-text">
+
+                                    CS6220.21066.202510
                             </p>
-                            <button> Go </button>
-                        </div>
+
+
+                            </div>
                     </Link>
+                    </div>
                 </div>
-                <div className="wd-dashboard-course">
-                    <Link className="wd-dashboard-course-link"
-                          to="/Kanbas/Courses/1234/Home">
-                        <img src="https://www.popwebdesign.net/popart_blog/wp-content/uploads/2018/03/reactjs.jpg" width={200} alt="ReactJS logo" />
-                        <div>
-                            <h5>
-                                CS1234 React JS
+                <div className="wd-dashboard-course col" style={{ width: "300px" }}>
+                    <div className="card rounded-3 overflow-hidden">
+                        <Link className="wd-dashboard-course-link text-decoration-none text-dark"
+
+                              to="/Kanbas/Courses/1234/Home">
+                        <img src="images/F-1.Orientation.U.S.Fall.2023.png" width="100%" height={160} />
+                            <div className="card-body">
+                                <h5 className="wd-dashboard-course-title card-title">
+
+                                    F-1.Orientation.U.S.Fall.2023
                             </h5>
-                            <p className="wd-dashboard-course-title">
-                                Full Stack software developer
+                                <p className="wd-dashboard-course-title card-text">
+
+                                    F-1.Orientation.U.S.Fall.2023
                             </p>
-                            <button> Go </button>
-                        </div>
+
+                            </div>
                     </Link>
+                    </div>
+
+                </div>
+                    <div className="wd-dashboard-course col" style={{ width: "300px" }}>
+                        <div className="card rounded-3 overflow-hidden">
+                            <Link className="wd-dashboard-course-link text-decoration-none text-dark"
+
+                                  to="/Kanbas/Courses/1234/Home">
+                                <img src="images/Fall2023.New.Student.Orientation.png" width="100%" height={160} />
+                                <div className="card-body">
+                                    <h5 className="wd-dashboard-course-title card-title">
+
+                                        Fall2023.New.Student.Orientation
+                                    </h5>
+                                    <p className="wd-dashboard-course-title card-text">
+
+                                        Fall2023.New.Student.Orientation
+                                    </p>
+
+
+                                </div>
+                            </Link>
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
