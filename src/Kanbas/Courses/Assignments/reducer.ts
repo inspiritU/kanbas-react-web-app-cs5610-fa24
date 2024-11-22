@@ -37,6 +37,9 @@ const assignmentsSlice = createSlice({
                 a._id === assignmentId ? { ...a, editing: true } : a
             ) as any;
         },
+        setAssignments: (state, { payload: assignments }) => {
+            state.assignments = assignments; // Replace the current assignments with the new list
+        },
     },
 });
 
@@ -45,6 +48,7 @@ export const {
     deleteAssignment,
     updateAssignment,
     editAssignment,
+    setAssignments,
 } = assignmentsSlice.actions;
 
 export default assignmentsSlice.reducer;

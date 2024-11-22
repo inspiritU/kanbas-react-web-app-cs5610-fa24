@@ -1,8 +1,9 @@
 import { Link, useNavigate } from "react-router-dom";
-import * as db from "./Database";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { enrollCourse, unenrollCourse } from "./Account/enrollmentReducer";
+import { enrollCourse, unenrollCourse, setEnrollments } from "./Account/enrollmentReducer";
+import { findMyCourses, findAllCourses } from "./Account/client";
+import { enrollCourse as apiEnrollCourse, unenrollCourse as apiUnenrollCourse } from "./Account/enrollmentApi";
 
 interface Course {
     _id: string;
@@ -20,6 +21,7 @@ interface DashboardProps {
     courses: Course[];
     course: Course;
     setCourse: (course: Course) => void;
+    setCourses: (courses: Course[]) => void; // Updated to include setCourses
     addNewCourse: () => void;
     deleteCourse: (courseId: string) => void;
     updateCourse: () => void;
@@ -29,6 +31,7 @@ export default function Dashboard({
                                       courses,
                                       course,
                                       setCourse,
+                                      setCourses, // Included setCourses
                                       addNewCourse,
                                       deleteCourse,
                                       updateCourse,
@@ -42,15 +45,68 @@ export default function Dashboard({
 
     const [showAllCourses, setShowAllCourses] = useState(false);
 
-    const toggleEnrollments = () => {
+    // Fetch enrollments on component mount if the user is a student
+    useEffect(() => {
+        if (isStudent) {
+            findMyCourses().then((data) => {
+                const formattedEnrollments = data.map((course: any) => ({
+                    userId: currentUser._id,
+                    courseId: course._id,
+                }));
+                dispatch(setEnrollments(formattedEnrollments));
+            });
+        }
+    }, [dispatch, currentUser, isStudent]);
+
+    const toggleEnrollments = async () => {
         setShowAllCourses(!showAllCourses);
+        if (!showAllCourses) {
+            try {
+                const allCourses = await findAllCourses();
+                setCourses(allCourses);
+            } catch (error) {
+                console.error("Failed to fetch all courses:", error);
+            }
+        }
     };
 
     const isEnrolled = (courseId: string) => {
-        return enrollments.some((enrollment) =>
-            enrollment.userId === currentUser._id &&
-            enrollment.courseId === courseId
+        return enrollments.some(
+            (enrollment) =>
+                enrollment.userId === currentUser._id && enrollment.courseId === courseId
         );
+    };
+
+    const handleEnroll = async (courseId: string) => {
+        try {
+            await apiEnrollCourse(currentUser._id, courseId);
+            dispatch(enrollCourse({ userId: currentUser._id, courseId }));
+
+            if (!showAllCourses) {
+                const updatedCourses = courses.map((course) =>
+                    course._id === courseId ? { ...course, enrolled: true } : course
+                );
+                setCourses(updatedCourses);
+            }
+        } catch (error) {
+            console.error("Failed to enroll in course:", error);
+        }
+    };
+
+    const handleUnenroll = async (courseId: string) => {
+        try {
+            await apiUnenrollCourse(currentUser._id, courseId);
+            dispatch(unenrollCourse({ userId: currentUser._id, courseId }));
+
+            if (!showAllCourses) {
+                const updatedCourses = courses.map((course) =>
+                    course._id === courseId ? { ...course, enrolled: false } : course
+                );
+                setCourses(updatedCourses);
+            }
+        } catch (error) {
+            console.error("Failed to unenroll from course:", error);
+        }
     };
 
     const displayedCourses = (isStudent && !showAllCourses)
@@ -119,7 +175,10 @@ export default function Dashboard({
                                 />
                                 <div className="card-body">
                                     <h5 className="wd-dashboard-course-title card-title">{course.name}</h5>
-                                    <p className="wd-dashboard-course-title card-text overflow-y-hidden" style={{ maxHeight: 100 }}>
+                                    <p
+                                        className="wd-dashboard-course-title card-text overflow-y-hidden"
+                                        style={{ maxHeight: 100 }}
+                                    >
                                         {course.description}
                                     </p>
                                 </div>
@@ -138,24 +197,14 @@ export default function Dashboard({
                                         isEnrolled(course._id) ? (
                                             <button
                                                 className="btn btn-sm btn-danger"
-                                                onClick={() =>
-                                                    dispatch(unenrollCourse({
-                                                        courseId: course._id,
-                                                        userId: currentUser._id
-                                                    }))
-                                                }
+                                                onClick={() => handleUnenroll(course._id)}
                                             >
                                                 Unenroll
                                             </button>
                                         ) : (
                                             <button
                                                 className="btn btn-sm btn-success"
-                                                onClick={() =>
-                                                    dispatch(enrollCourse({
-                                                        courseId: course._id,
-                                                        userId: currentUser._id
-                                                    }))
-                                                }
+                                                onClick={() => handleEnroll(course._id)}
                                             >
                                                 Enroll
                                             </button>

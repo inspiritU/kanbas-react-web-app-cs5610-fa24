@@ -1,26 +1,36 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "target": "ES6", // 将目标版本设置为 ES6 或更高版本
     "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
+      "DOM",
+      "DOM.Iterable",
+      "ESNext"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx"
+    "allowJs": true, // 允许导入 JavaScript 文件
+    "skipLibCheck": true, // 跳过库的类型检查，减少编译时间
+    "esModuleInterop": true, // 支持 CommonJS 和 ES 模块互操作
+    "allowSyntheticDefaultImports": true, // 允许从非 ES 模块中默认导入
+    "strict": true, // 开启严格模式
+    "forceConsistentCasingInFileNames": true, // 强制文件名大小写一致
+    "noFallthroughCasesInSwitch": true, // 防止 switch 语句遗漏 break
+    "module": "ESNext", // 使用 ES 模块
+    "moduleResolution": "Node", // 使用 Node.js 模块解析方式
+    "resolveJsonModule": true, // 支持导入 JSON 文件
+    "isolatedModules": true, // 确保每个文件是单独的模块
+    "noEmit": false, // 允许输出编译结果
+    "outDir": "./dist", // 编译后的输出目录
+    "jsx": "react-jsx", // 使用 React 17 的 JSX 转换模式
+    "strictNullChecks": true, // 严格检查 null 和 undefined
+    "baseUrl": "./", // 设置项目的根目录
+    "paths": {
+      "@/*": ["src/*"] // 简化路径映射，例如 `import xxx from '@/components'`
+    }
   },
   "include": [
-    "src"
+    "src/**/*" // 包含 src 目录中的所有文件
+  ],
+  "exclude": [
+    "node_modules", // 排除 node_modules 目录
+    "dist" // 排除输出目录
   ]
 }

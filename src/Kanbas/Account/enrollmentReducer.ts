@@ -1,9 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import enrollmentsData from "../Database/enrollments.json";
 
 interface Enrollment {
-    courseId: string;
     userId: string;
+    courseId: string;
 }
 
 interface EnrollmentState {
@@ -11,32 +10,27 @@ interface EnrollmentState {
 }
 
 const initialState: EnrollmentState = {
-    enrollments: enrollmentsData.map((enrollment: any) => ({
-        courseId: enrollment.course,
-        userId: enrollment.user,
-    })),
+    enrollments: [],
 };
 
-const enrollmentSlice = createSlice({
-    name: "enrollment",
+const enrollmentsSlice = createSlice({
+    name: "enrollments",
     initialState,
     reducers: {
-        enrollCourse: (state, action: PayloadAction<Enrollment>) => {
-            const newEnrollment: Enrollment = {
-                courseId: action.payload.courseId,
-                userId: action.payload.userId,
-            };
-            state.enrollments.push(newEnrollment);
+        setEnrollments: (state, action: PayloadAction<Enrollment[]>) => {
+            state.enrollments = action.payload;
         },
-        unenrollCourse: (state, action: PayloadAction<Enrollment>) => {
+        enrollCourse: (state, action: PayloadAction<Enrollment>) => {
+            state.enrollments.push(action.payload);
+        },
+        unenrollCourse: (state, action: PayloadAction<{ userId: string; courseId: string }>) => {
+            const { userId, courseId } = action.payload;
             state.enrollments = state.enrollments.filter(
-                (enrollment) =>
-                    enrollment.courseId !== action.payload.courseId ||
-                    enrollment.userId !== action.payload.userId
+                (enrollment) => !(enrollment.userId === userId && enrollment.courseId === courseId)
             );
         },
     },
 });
 
-export const { enrollCourse, unenrollCourse } = enrollmentSlice.actions;
-export default enrollmentSlice.reducer;
+export const { setEnrollments, enrollCourse, unenrollCourse } = enrollmentsSlice.actions;
+export default enrollmentsSlice.reducer;

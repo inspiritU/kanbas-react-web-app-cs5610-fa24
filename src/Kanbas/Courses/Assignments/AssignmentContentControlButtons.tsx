@@ -13,5 +13,7 @@ export default function AssignmentContentControlButtons({ id, deleteAssignment, 
             <GreenCheckmark />
             <IoEllipsisVertical className="fs-4" />
         </div>
-    );}
+    );
+}
+
 
