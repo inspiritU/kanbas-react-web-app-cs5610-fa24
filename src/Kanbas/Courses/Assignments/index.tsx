@@ -1,198 +1,167 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
-import AssignmentsControls from "./AssignmentsControls";
 import { BsGripVertical } from "react-icons/bs";
-import AssignmentControlButtons from "./AssignmentControlButtons";
-import AssignmentContentControlButtons from "./AssignmentContentControlButtons";
-import { FaRegFileLines } from "react-icons/fa6";
-import { useSelector, useDispatch } from "react-redux";
-import { addAssignment, deleteAssignment, updateAssignment, editAssignment, setAssignments } from "./reducer";
-import * as client from "./client";
-
-interface Assignment {
-    _id: string;
-    title: string;
-    description: string;
-    points: number;
-    dueDate: string;
-    availableFrom: string;
-    availableUntil: string;
-    editing: boolean;
-    course: string;
-}
+import AssignmentControls from "./AssignmentsControls";
+import { RxTriangleDown } from "react-icons/rx";
+import AssignmentsControlButtons from "./AssignmentControlButtons";
+import { MdOutlineAssignment } from "react-icons/md";
+import { IoEllipsisVertical } from "react-icons/io5";
+import { FaCheckCircle, FaCircle, FaTrash } from "react-icons/fa";
+import { useParams } from "react-router";
+import { useDispatch, useSelector } from "react-redux";
+import { format } from "date-fns";
+import { deleteAssignment, setAssignments } from "./reducer";
+import { useEffect, useState } from "react";
+import * as coursesClient from "../client";
+import * as assignmentsClient from "./client";
 
 export default function Assignments() {
-    const { cid } = useParams<{ cid: string }>();
-    const dispatch = useDispatch();
-    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    const { cid } = useParams();
     const { assignments } = useSelector((state: any) => state.assignmentsReducer);
+    const { currentUser } = useSelector((state: any) => state.accountReducer);
+    const dispatch = useDispatch();
+    const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(
+        null
+    );
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
-    const [points, setPoints] = useState(100);
-    const [dueDate, setDueDate] = useState("");
-    const [availableFrom, setAvailableFrom] = useState("");
-    const [availableUntil, setAvailableUntil] = useState("");
+    const fetchAssignments = async () => {
+        const assignments = await coursesClient.findAssignmentsForCourse(
+            cid as string
+        );
+        // 验证日期值是否有效
+        assignments.forEach((assign: any) => {
+            console.log("fromDate:", assign.fromDate, "dueDate:", assign.dueDate);
+        });
+        dispatch(setAssignments(assignments));
+    };
 
-    // Fetch assignments on mount
     useEffect(() => {
-        const fetchAssignments = async () => {
-            if (cid) {
-                const fetchedAssignments = await client.fetchAssignments(cid);
-                dispatch(setAssignments(fetchedAssignments));
-            }
-        };
         fetchAssignments();
-    }, [cid, dispatch]);
+    }, []);
 
-    const handleAddAssignment = async () => {
-        if (cid) {
-            const newAssignment = {
-                title,
-                description,
-                points,
-                dueDate,
-                availableFrom,
-                availableUntil,
-                course: cid,
-            };
-            const createdAssignment = await client.createAssignment(cid, newAssignment);
-            dispatch(setAssignments([...assignments, createdAssignment]));
-            setTitle("");
-            setDescription("");
-            setPoints(100);
-            setDueDate("");
-            setAvailableFrom("");
-            setAvailableUntil("");
+    const handleDeleteClick = (id: string) => {
+        setAssignmentToDelete(id);
+    };
+
+    const confirmDelete = async (assignmentId: string) => {
+        if (assignmentToDelete) {
+            await assignmentsClient.deleteAssignment(assignmentId);
+            dispatch(deleteAssignment(assignmentToDelete));
+            setAssignmentToDelete(null);
         }
     };
 
-    const handleUpdateAssignment = async (assignment: Assignment, updates: Partial<Assignment>) => {
-        await client.updateAssignment(assignment._id, updates);
-        const updatedAssignments = assignments.map((a: Assignment) =>
-            a._id === assignment._id ? { ...a, ...updates } : a
-        );
-        dispatch(setAssignments(updatedAssignments));
+    const cancelDelete = () => {
+        setAssignmentToDelete(null);
     };
 
-    const handleDeleteAssignment = async (assignmentId: string) => {
-        if (window.confirm("Are you sure you want to delete this assignment?")) {
-            await client.deleteAssignment(assignmentId);
-            const remainingAssignments = assignments.filter((a: Assignment) => a._id !== assignmentId);
-            dispatch(setAssignments(remainingAssignments));
+    // 安全的日期格式化函数
+    const safeFormat = (date: string | undefined | null, dateFormat: string): string => {
+        if (!date) return "N/A";
+        try {
+            return format(new Date(date), dateFormat);
+        } catch (error) {
+            console.error("Invalid date value:", date);
+            return "N/A";
         }
     };
 
     return (
-        <div id="wd-assignments">
-            {/* Show AssignmentsControls only if user is Faculty */}
-            {currentUser?.role === "FACULTY" && (
-                <AssignmentsControls
-                    title={title}
-                    setTitle={setTitle}
-                    description={description}
-                    setDescription={setDescription}
-                    points={points}
-                    setPoints={setPoints}
-                    dueDate={dueDate}
-                    setDueDate={setDueDate}
-                    availableFrom={availableFrom}
-                    setAvailableFrom={setAvailableFrom}
-                    availableUntil={availableUntil}
-                    setAvailableUntil={setAvailableUntil}
-                    addAssignment={handleAddAssignment}
-                />
-            )}
-            <br />
-            <br />
-            <ul id="wd-assignment-list" className="list-group rounded-0">
-                <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
-                    <div className="wd-title p-3 ps-2 bg-secondary">
-                        <BsGripVertical className="me-2 fs-3" />
-                        ASSIGNMENTS
-                        <AssignmentControlButtons />
-                    </div>
-                    <ul className="wd-lessons list-group rounded-0">
-                        {assignments
-                            .filter((assignment: Assignment) => assignment.course === cid)
-                            .map((assignment: Assignment) => (
-                                <li key={assignment._id} className="wd-lesson list-group-item p-3 ps-1 d-flex justify-content-between align-items-center">
+        <div id="wd-assignments" className="container-fluid">
+            <div>
+                <AssignmentControls currentUser={currentUser} />
+            </div>
+            <div className="mt-4">
+                <ul id="wd-assignments" className="list-group rounded-0">
+                    <li className="wd-assignment-lists list-group-item p-0 mb-5 fs-5 border-light shadow-sm">
+                        <div className="wd-title p-3 ps-2 bg-light d-flex align-items-center justify-content-between flex-wrap">
+                            <div className="d-flex align-items-center flex-nowrap">
+                                <div className="d-flex align-items-center me-2">
+                                    <BsGripVertical className="fs-4 text-secondary" />
+                                    <RxTriangleDown className="fs-3 ms-2" />
+                                </div>
+                                <b className="ms-2">ASSIGNMENTS</b>
+                            </div>
+                            <div className="d-flex align-items-center mt-2 mt-sm-0">
+                                <span
+                                    className="border border-1 rounded-pill px-3 py-1 me-2"
+                                    id="wd-assignments-title"
+                                >
+                                    40% of Total
+                                </span>
+                                <AssignmentsControlButtons />
+                            </div>
+                        </div>
+
+                        <ul className="wd-assignment-list list-group list-group-flush">
+                            {assignments.map((assign: any) => (
+                                <li
+                                    key={assign._id}
+                                    className="wd-assignment-list-item list-group-item p-4 border-bottom"
+                                >
                                     <div className="d-flex align-items-center">
-                                        <BsGripVertical className="me-2 fs-3" />
-                                        <FaRegFileLines className="me-3 text-success" />
-                                        <div>
-                                            <div>
-                                                {!assignment.editing ? (
-                                                    <strong>{assignment.title}</strong>
-                                                ) : (
-                                                    <input
-                                                        className="form-control w-50 d-inline-block"
-                                                        onChange={(e) =>
-                                                            handleUpdateAssignment(assignment, { title: e.target.value })
-                                                        }
-                                                        onKeyDown={(e) => {
-                                                            if (e.key === "Enter") {
-                                                                handleUpdateAssignment(assignment, { editing: false });
-                                                            }
-                                                        }}
-                                                        defaultValue={assignment.title}
-                                                    />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <span className="text-danger">Multiple Modules</span> | <strong>Not available until</strong>{" "}
-                                                {!assignment.editing ? (
-                                                    assignment.availableFrom
-                                                ) : (
-                                                    <input
-                                                        className="form-control d-inline-block w-auto"
-                                                        type="date"
-                                                        onChange={(e) =>
-                                                            handleUpdateAssignment(assignment, { availableFrom: e.target.value })
-                                                        }
-                                                        defaultValue={assignment.availableFrom}
-                                                    />
-                                                )}{" "}
-                                                | <strong>Due</strong>{" "}
-                                                {!assignment.editing ? (
-                                                    assignment.dueDate
-                                                ) : (
-                                                    <input
-                                                        className="form-control d-inline-block w-auto"
-                                                        type="date"
-                                                        onChange={(e) =>
-                                                            handleUpdateAssignment(assignment, { dueDate: e.target.value })
-                                                        }
-                                                        defaultValue={assignment.dueDate}
-                                                    />
-                                                )}{" "}
-                                                | {!assignment.editing ? (
-                                                `${assignment.points} pts`
-                                            ) : (
-                                                <input
-                                                    className="form-control d-inline-block w-auto"
-                                                    type="number"
-                                                    onChange={(e) =>
-                                                        handleUpdateAssignment(assignment, { points: Number(e.target.value) })
-                                                    }
-                                                    defaultValue={assignment.points}
-                                                />
-                                            )}
+                                        <div className="d-flex align-items-center flex-nowrap me-3">
+                                            <BsGripVertical className="fs-4 text-secondary" />
+                                            <MdOutlineAssignment style={{ color: "green" }} />
+                                        </div>
+                                        <div className="flex-grow-1">
+                                            <a
+                                                className="wd-assignment-link text-dark"
+                                                href={`#/Kanbas/Courses/${cid}/Assignments/${assign._id}`}
+                                            >
+                                                <b>{assign.title}</b>
+                                            </a>
+                                            <div className="text-muted mt-1">
+                                                <span style={{ color: "red" }}>Multiple Modules</span>{" "}
+                                                | <b>Not available until</b>{" "}
+                                                {safeFormat(assign.fromDate, "MMM d")} at 12:00am |{" "}
+                                                <b>Due</b>{" "}
+                                                {safeFormat(assign.dueDate, "MMM d")} at 11:59pm |{" "}
+                                                {assign.points} pts
                                             </div>
                                         </div>
+                                        <div className="d-flex align-items-center flex-nowrap">
+                                            {currentUser.role === "FACULTY" ? (
+                                                <FaTrash
+                                                    onClick={() => handleDeleteClick(assign._id)}
+                                                    className="text-danger fs-5 me-2"
+                                                />
+                                            ) : (
+                                                ""
+                                            )}
+                                            {assignmentToDelete === assign._id && (
+                                                <div className="confirm-dialog-overlay">
+                                                    <div className="confirm-dialog">
+                                                        <p>
+                                                            Are you sure you want to remove this assignment?
+                                                        </p>
+                                                        <button
+                                                            onClick={() => confirmDelete(assign._id)}
+                                                            className="btn btn-danger me-2"
+                                                        >
+                                                            Yes
+                                                        </button>
+                                                        <button
+                                                            onClick={cancelDelete}
+                                                            className="btn btn-secondary"
+                                                        >
+                                                            No
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                            <FaCheckCircle
+                                                style={{ top: "2px" }}
+                                                className="text-success"
+                                            />
+                                            <FaCircle className="text-white fs-6" />
+                                            <IoEllipsisVertical className="fs-4" />
+                                        </div>
                                     </div>
-                                    {currentUser?.role === "FACULTY" && (
-                                        <AssignmentContentControlButtons
-                                            id={assignment._id}
-                                            deleteAssignment={() => handleDeleteAssignment(assignment._id)}
-                                            editAssignment={() => handleUpdateAssignment(assignment, { editing: true })}
-                                        />
-                                    )}
                                 </li>
                             ))}
-                    </ul>
-                </li>
-            </ul>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
     );
 }

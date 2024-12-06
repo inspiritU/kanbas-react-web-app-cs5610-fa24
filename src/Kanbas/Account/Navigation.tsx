@@ -1,19 +1,41 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
-import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
+import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+
 export default function AccountNavigation() {
     const { currentUser } = useSelector((state: any) => state.accountReducer);
     const links = currentUser ? ["Profile"] : ["Signin", "Signup"];
+    const active = (path: string) =>
+        pathname.includes(path) ? "active text-black" : "";
     const { pathname } = useLocation();
 
     return (
-        <div id="wd-account-navigation" className="wd list-group fs-5 rounded-0">
-            <NavLink id="wd-account-profile-link" to="/Kanbas/Account/Signin" className={({ isActive }) => "list-group-item border border-0" + (isActive ? "list-group-item active border border-0" : "list-group-item text-danger border border-0")}>Signin
-            </NavLink>
-            <NavLink id="wd-account-profile-link" to="/Kanbas/Account/Signup" className={({ isActive }) => "list-group-item border border-0" + (isActive ? "list-group-item active border border-0" : "list-group-item text-danger border border-0")}>Signup
-            </NavLink>
-            <NavLink id="wd-account-profile-link" to="/Kanbas/Account/Profile" className={({ isActive }) => "list-group-item border border-0" + (isActive ? "list-group-item active border border-0" : "list-group-item text-danger border border-0")}>Profile
-            </NavLink>
+        <div
+            className="wd list-group rounded-0 fs-5 d-none d-md-block"
+            id="wd-account-navigation">
+            <Link
+                className={`list-group-item border-0 text-danger ${active("signin")}`}
+                to={currentUser ? `/Kanbas/Account/Profile` : `/Kanbas/Account/Signin`}>
+                Signin
+            </Link>
+            <Link
+                className={`list-group-item border-0 text-danger ${active("signup")}`}
+                to={currentUser ? `/Kanbas/Account/Profile` : `/Kanbas/Account/Signup`}>
+                Signup
+            </Link>
+            <Link
+                className={`list-group-item border-0 text-danger ${active("Profile")}`}
+                to={`/Kanbas/Account/Profile`}>
+                Profile
+            </Link>
+
+            {currentUser && currentUser.role === "ADMIN" && (
+                <Link
+                    to={`/Kanbas/Account/Users`}
+                    className={`list-group-item border-0 text-danger ${active("Users")}`}>
+
+                    Users
+                </Link>
+            )}
         </div>
     );
 }
